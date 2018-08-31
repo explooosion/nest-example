@@ -1,8 +1,14 @@
-import { Controller, Get, Delete, Put, Post, Query, Body, Param, HttpCode, Header } from '@nestjs/common';
+import { Controller } from '@nestjs/common';
+import { Get, Delete, Put, Post, Query, Body, Param } from '@nestjs/common';
+import { HttpCode, Header, HttpException, HttpStatus } from '@nestjs/common';
+import { UseFilters } from '@nestjs/common';
 
 import { CreateCatDto } from './dto/create-cat.dto';
 import { CatsService } from './cats.service';
 import { Cat } from './interfaces/cat.interface';
+
+import { ForbiddenException } from '../common/exception/forbidden.exception';
+import { HttpExceptionFilter } from '../common/exception/HTTP-exception.filter';
 
 @Controller('cats')
 export class CatsController {
@@ -17,8 +23,14 @@ export class CatsController {
   // }
 
   @Post()
+  @UseFilters(new HttpExceptionFilter())
   async create(@Body() createCatDto: CreateCatDto) {
     this.catsService.create(createCatDto);
+    throw new ForbiddenException();
+    // throw new HttpException({
+    //   status: HttpStatus.FORBIDDEN,
+    //   error: 'This is a custom message',
+    // }, 403);
   }
 
   // @Get()
